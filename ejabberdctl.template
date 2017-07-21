@@ -16,12 +16,13 @@ EPMD="{{epmd}}"
 INSTALLUSER={{installuser}}
 
 # check the proper system user is used if defined
-EXEC_CMD="false"
 if [ -n "$INSTALLUSER" ] ; then
-    if [ $(id -g) -eq $(id -g $INSTALLUSER || echo -1) ] ; then
+    if [ $(id -g) -eq $(id -g "$INSTALLUSER" || echo -1) ] ; then
         EXEC_CMD="as_current_user"
+    elif [ $(id -u) -eq 0 ]; then
+        EXEC_CMD="as_install_user"
     else
-        id -un | grep -q root && EXEC_CMD="as_install_user"
+        EXEC_CMD="false"
     fi
 else
     EXEC_CMD="as_current_user"
